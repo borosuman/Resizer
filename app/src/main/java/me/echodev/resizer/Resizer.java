@@ -20,9 +20,13 @@ import me.echodev.resizer.util.ImageUtils;
  * An image resizing library for Android, which allows you to scale an image file to a smaller or bigger one while keeping the aspect ratio.
  */
 public class Resizer {
-    private int targetLength, quality;
+    private int targetWidth;
+    private int targetHeight;
+    private int quality;
+    private boolean aspectRatio;
     private Bitmap.CompressFormat compressFormat;
-    private String outputDirPath, outputFilename;
+    private String outputDirPath;
+    private String outputFilename;
     private File sourceImage;
 
     /**
@@ -30,7 +34,7 @@ public class Resizer {
      * @param context The global application context. You can get it by getApplicationContext().
      */
     public Resizer(Context context) {
-        targetLength = 1080;
+        targetWidth = 1080;
         quality = 80;
         compressFormat = Bitmap.CompressFormat.JPEG;
         outputDirPath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
@@ -38,14 +42,25 @@ public class Resizer {
     }
 
     /**
-     * Set the target length of the image. You only need to specify the target length of the longer side (or either side if it's a square). Resizer will calculate the rest automatically.
-     * @param targetLength The target image length in pixel. The default value is 1080.
+     * Set the target width of the image. You only need to specify the target width of the longer side (or either side if it's a square). Resizer will calculate the rest automatically.
+     * @param targetWidth The target image width in pixel. The default value is 1080.
      * @return This Resizer instance, for chained settings.
      */
-    public Resizer setTargetLength(int targetLength) {
-        this.targetLength = (targetLength < 0) ? 0 : targetLength;
+    public Resizer setTargetWidth(int targetWidth) {
+        this.targetWidth = (targetWidth < 0) ? 0 : targetWidth;
         return this;
     }
+
+    /**
+     * Set the target height of the image.
+     * @param targetHeight The target image height in pixel. The default value is 1080.
+     * @return This Resizer instance, for chained settings.
+     */
+    public Resizer setTargetHeight(int targetHeight) {
+        this.targetHeight = (targetHeight < 0) ? 0 : targetHeight;
+        return this;
+    }
+
 
     /**
      * Set the image quality. The higher value, the better image quality but larger file size. PNG, which is a lossless format, will ignore the quality setting.
@@ -62,6 +77,17 @@ public class Resizer {
         }
         return this;
     }
+
+    /**
+     * Set the aspect ratio of the image.
+     * @param aspectRatio The target image height in pixel. The default value is 1080.
+     * @return This Resizer instance, for chained settings.
+     */
+    public Resizer setAspectRatio(boolean aspectRatio) {
+        this.aspectRatio = aspectRatio;
+        return this;
+    }
+
 
     /**
      * Set the image compression format by String.
@@ -146,7 +172,7 @@ public class Resizer {
      * @throws IOException
      */
     public File getResizedFile() throws IOException {
-        return ImageUtils.getScaledImage(targetLength, quality, compressFormat, outputDirPath, outputFilename,
+        return ImageUtils.getScaledImage(targetWidth, targetHeight, quality, aspectRatio, compressFormat, outputDirPath, outputFilename,
                 sourceImage);
     }
 
@@ -156,7 +182,7 @@ public class Resizer {
      * @throws IOException
      */
     public Bitmap getResizedBitmap() throws IOException {
-        return ImageUtils.getScaledBitmap(targetLength, sourceImage);
+        return ImageUtils.getScaledBitmap(targetWidth, targetHeight, aspectRatio, sourceImage);
     }
 
     /**
